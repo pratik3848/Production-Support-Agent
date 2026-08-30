@@ -3,8 +3,6 @@
 Instead of an engineer manually triaging every pipeline failure, an agent investigates first — gathering evidence, determining root cause, and either safely remediating the issue or escalating it to a human when the situation calls for judgment.
 
 ---
-Use this short version in the README, and then explain it using the detailed script:
-
 ## The Problem
 
 Our production environment had more than **1,500 Airflow Composer pipelines** running at different cadences and supporting downstream data and business reports.
@@ -17,9 +15,6 @@ When a pipeline failed, the production-support process was largely manual:
 * Apply a fix and retry, or escalate the issue to the appropriate data team
 
 A routine investigation took approximately **12–15 minutes per failure**, and multiple failures could quickly create a support queue.
-
-
-Replace the table with this. It keeps the idea but reads like a project README rather than a presentation slide.
 
 ## The Solution
 
@@ -131,8 +126,6 @@ Consider an Airflow task that fails because a column available in the source tab
 
 If the schemas or required evidence cannot be retrieved, the agent escalates the incident for manual investigation instead of making an unsupported conclusion.
 
-
-Use **“Production Safety and Guardrails”** as the heading. It sounds more like engineering documentation than a presentation.
 
 ## Production Safety and Guardrails
 
