@@ -77,6 +77,8 @@ Task Failure → Failure Monitoring + Logs → Preprocessing & Enrichment
                  │ read_log_section          │
                  │ send_email                │
                  │ update_job_status         │
+                 │ provide_feedback          │
+                 │ check_source_file         │
                  └───────────────────────────┘
                             ▼
                Tools + Evidence → RCA + Decision
