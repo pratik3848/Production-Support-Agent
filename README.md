@@ -63,6 +63,9 @@ Task Failure → Failure Monitoring + Logs → Preprocessing & Enrichment
                      │ update_infra_     │
                      │ job_status        │
                      └───────────────────┘
+                     ┌───────────────────┐
+                     │ ping_external_db  │
+                     └───────────────────┘
         │                  │                       │
         └──────────────────┴───────────────────────┘
                             ▼
