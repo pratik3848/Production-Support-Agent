@@ -85,8 +85,6 @@ Task Failure → Failure Monitoring + Logs → Preprocessing & Enrichment
 
 A failure comes in, agents investigate, tools gather evidence, and the system either acts safely or escalates to a human.
 
-**Stack:** Google ADK · Gemini · Airflow / Composer · PostgreSQL · BigQuery · FastAPI
-
 ## Tech Stack
 
 **Airflow / Composer · PostgreSQL · Google ADK · Gemini · FastAPI · BigQuery · GCS · Docker · GitHub Actions · JFrog · Helm · ArgoCD · GKE · Istio**
