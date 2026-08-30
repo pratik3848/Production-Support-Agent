@@ -100,7 +100,7 @@ flowchart LR
     DB --> API["FastAPI + Google ADK<br/>Agents (Gemini)"]
     API --> BQ[("BigQuery / GCS")]
     API --> DASH["Monitoring<br/>Dashboard"]
-    API --> DASH["Email alert<br/>"]
+    API --> EMAIL["Email alert<br/>"]
 
     GHA["GitHub Actions"] --> JFROG["JFrog"] --> ARGO["ArgoCD"] --> GKE["GKE<br/>(runs the API)"]
     GKE -.deploys.-> API
