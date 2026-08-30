@@ -1,37 +1,42 @@
 # Agentic AI for Production Support
 
-**Reimagining production support with agents: a shift in the operating model, not just task automation.**
-
 Instead of an engineer manually triaging every pipeline failure, an agent investigates first — gathering evidence, determining root cause, and either safely remediating the issue or escalating it to a human when the situation calls for judgment.
 
 ---
+Use this short version in the README, and then explain it using the detailed script:
 
 ## The Problem
 
-In a traditional, human-led support model, every failure — no matter how routine — follows the same expensive path:
+Our production environment had more than **1,500 Airflow Composer pipelines** running at different cadences and supporting downstream data and business reports.
 
-- An engineer opens and reviews 1,000+ lines of logs
-- Manually investigates the root cause
-- Checks retry history and current production state
-- Decides whether to retry or escalate
-- Takes manual action
+When a pipeline failed, the production-support process was largely manual:
 
-This means engineering time is spent re-investigating the same known failure patterns over and over, and response time depends on whoever is on shift.
+* Review 1,000+ lines of Airflow logs
+* Investigate the source system, BigQuery, or other connected services to understand
+* Identify the root cause and check retry history
+* Apply a fix and retry, or escalate the issue to the appropriate data team
 
-## The Shift: Agent-Led, Human-on-Exceptions
+A routine investigation took approximately **12–15 minutes per failure**, and multiple failures could quickly create a support queue.
 
-In the agent-first model, an agent becomes the first line of production support:
 
-| Traditional Production Support | Agent-First Production Support |
-|---|---|
-| Engineer opens and reviews 1,000+ lines of logs | Agent analyzes logs and failure context |
-| Identifies the actual error | Identifies root cause and supporting evidence |
-| Investigates root cause | Checks retry history and current production state |
-| Checks retry history and production impact | Determines the safest next action |
-| Engineer decides retry vs. escalate | **Known/safe failure →** agent handles remediation |
-| Engineer investigates every failure | **Complex/uncertain failure →** human engineer takes over |
+Replace the table with this. It keeps the idea but reads like a project README rather than a presentation slide.
 
-Humans move from investigating *every* failure to handling only the cases that actually need judgment.
+## The Solution
+
+I designed and built an **Agentic AI production-support application** that automates the investigation workflow—from analyzing logs and gathering evidence to identifying the root cause and determining the next action.
+
+The agent acts as the first line of production support while keeping a human in the loop for risky, complex, or uncertain situations.
+
+```text
+Pipeline Failure
+      ↓
+Agent Investigation and RCA
+      ↓
+Known and Safe → Controlled Remediation
+Complex or Uncertain → Human Escalation
+```
+
+Instead of starting every investigation from the beginning, engineers receive an incident with the root cause, supporting evidence, and recommended next steps already prepared.
 
 ## Architecture
 
@@ -92,7 +97,7 @@ A failure comes in, agents investigate, tools gather evidence, and the system ei
 
 ## Tech Stack
 
-**Airflow / Composer · PostgreSQL · Google ADK · Gemini · FastAPI · BigQuery · GCS · Docker · GitHub Actions · JFrog · Helm · ArgoCD · GKE · Istio**
+**Airflow / Composer · PostgreSQL · Google ADK · Gemini · FastAPI · BigQuery · GCS · Docker · GitHub Actions · JFrog · ArgoCD · GKE**
 
 ```mermaid
 flowchart LR
@@ -105,50 +110,58 @@ flowchart LR
     GKE -.deploys.-> API
 ```
 
-## Example: Handling a Connection Timeout
+## End-to-End Example: Schema Mismatch
 
-A walkthrough of one real failure, end to end:
+Consider an Airflow task that fails because a column available in the source table is missing from the target table.
 
-1. **Failure Detected** — An Airflow task fails with `"Connection timeout while connecting to Snowflake"`. The Master Agent identifies it as an infrastructure/connectivity issue and routes it to the Infrastructure Agent.
-2. **Classify & Route** — The agent asks: does the error look transient?
-3. **Check Before Acting** — Before doing anything, the agent verifies:
-   - Is this still the latest failure?
-   - Is this DAG approved for auto-retry?
-   - How many retries have already happened?
-4. **Decision:**
-   - **Transient + checks pass →** safe retry → track outcome → success → close
-   - **Persistent / uncertain →** routed to human review
+1. **Submit the Failure**
+   The preprocessing workflow captures the failed task, prepares the relevant log context, and submits it to the Master Agent.
 
-The agent doesn't retry just because it sees an error — it verifies the situation first.
+2. **Classify and Route**
+   The Master Agent identifies the error as a schema mismatch and transfers the incident to the Schema and Data Quality Agent.
 
-## Building Trust: Production Guardrails
+3. **Validate the Schemas**
+   The specialist agent retrieves and compares the source and target table schemas to verify the missing column.
 
-LLM reasoning is used to *investigate*. Deterministic controls decide what's allowed to *happen* in production.
+4. **Identify the Root Cause**
+   The agent confirms that the source schema changed but the corresponding target schema and pipeline mapping were not updated.
 
-Automated action is only allowed when **all** of the following hold:
+5. **Complete the Investigation**
+   The agent sends the responsible data team an RCA with the affected table, missing column, supporting evidence, and recommended fix. It then updates the incident status as completed.
 
-- The DAG is approved for automated retry
-- The incident is still the latest failure
-- The current task is actually failed
-- Retry count is below the limit
-- The failure is recent
-- Evidence supports a transient issue
-- RCA is supported by evidence, with full incident and retry history available
+If the schemas or required evidence cannot be retrieved, the agent escalates the incident for manual investigation instead of making an unsupported conclusion.
 
-**If evidence is incomplete or uncertain → the case goes to human investigation.**
 
-This combination of LLM reasoning plus deterministic production controls is what enables a **~80–90% reduction in manual RCA effort** without compromising safety.
+Use **“Production Safety and Guardrails”** as the heading. It sounds more like engineering documentation than a presentation.
 
-## Measured Impact in Production
+## Production Safety and Guardrails
 
-Three KPIs tracked during rollout:
+Because the agent interacts with production systems, the LLM is not given direct authority to perform an action. The LLM investigates the failure and recommends a next step, while deterministic logic inside the tools decides whether the action is allowed.
 
-| KPI | Result | What it means |
-|---|---|---|
-| **Cost** — Investigation Efficiency | **80–90%** of failures resolved with no engineer investigating | Out of 10 pipeline failures, 8–9 get an RCA and fix sent straight to the data team with zero engineer time. Only 1–2 out of 10 are escalated to a person. |
-| **Experience** — Response Time | **1–3 min**, consistent automated response, handled in parallel | Replaces a shift-dependent, queue-based response — e.g., 5 pipelines failing overnight no longer queue behind the on-shift engineer; all 5 are answered within minutes. |
-| **Trust** — Safety & Quality | **98–99%** of automated actions were correct and safe | Roughly 1–2 of every 100 attempted retries needed a human correction, measured during early rollout. |
+```text
+LLM Investigation
+       ↓
+Recommended Action
+       ↓
+Deterministic Tool Validation
+       ↓
+Execute Safely or Escalate to a Human
+```
 
-Engineers now spend their time on the 1–2 failures that need judgment — not on the 8–9 that don't.
+Before triggering a retry, the tool verifies that:
+
+* The DAG is approved for automated retry
+* Live Airflow validation has been completed
+* The incident represents the latest failed task
+* The retry and failure-age limits have not been exceeded
+
+
+## Production Impact
+
+| Metric                       | Observed Result                                                                                                                             |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Manual investigation**     | **80–90%** of supported failures received an automated RCA with the exact root cause, supporting evidence, and specific steps to resolve the issue—without requiring an initial manual investigation.
+| **Time to initial RCA**      | Reduced from approximately **12–15 minutes manually** to **1–3 minutes automatically**                                                      |
+| **Automated action quality** | **98–99%** of automated actions required no human correction during the initial rollout                                                     |
 
 ---
