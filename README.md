@@ -49,17 +49,17 @@ Task Failure → Failure Monitoring + Logs → Preprocessing & Enrichment
   Quality Agent      Connectivity Agent
         │                  │                       │
         ▼                  ▼                       ▼
- ┌───────────────┐  ┌───────────────────┐   ┌───────────────┐
- │ get_table_    │  │ is_record_latest  │   │ get_table_    │
- │ schema        │  └───────────────────┘   │ schema        │
- └───────────────┘  ┌───────────────────┐   └───────────────┘
- ┌───────────────┐  │ trigger_dag_retry │   ┌───────────────┐
- │ query_table_  │  └───────────────────┘   │ query_table_  │
- │ count         │  ┌───────────────────┐   │ count         │
- └───────────────┘  │ record_retry_     │   └───────────────┘
- ┌───────────────┐  │ attempt           │   ┌───────────────┐
- │ execute_query │  └───────────────────┘   │ execute_query │
- └───────────────┘   ┌───────────────────┐  └───────────────┘
+ ┌───────────────┐  ┌───────────────────┐   ┌─────────────────────────────────────┐
+ │ get_table_    │  │ is_record_latest  │   │ Has access to all tools for RCA     │
+ │ schema        │  └───────────────────┘   │ and Feedback                        │
+ └───────────────┘  ┌───────────────────┐   └─────────────────────────────────────┘
+ ┌───────────────┐  │ trigger_dag_retry │   
+ │ query_table_  │  └───────────────────┘   
+ │ count         │  ┌───────────────────┐   
+ └───────────────┘  │ record_retry_     │   
+ ┌───────────────┐  │ attempt           │   
+ │ execute_query │  └───────────────────┘   
+ └───────────────┘   ┌───────────────────┐  
                      │ update_infra_     │
                      │ job_status        │
                      └───────────────────┘
