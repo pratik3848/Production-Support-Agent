@@ -18,7 +18,7 @@ A routine investigation took approximately **12–15 minutes per failure**, and 
 
 ## The Solution
 
-I designed and built an **Agentic AI production-support application** that automates the investigation workflow—from analyzing logs and gathering evidence to identifying the root cause and determining the next action.
+**Agentic AI production-support application** that automates the investigation workflow.
 
 The agent acts as the first line of production support while keeping a human in the loop for risky, complex, or uncertain situations.
 
@@ -49,17 +49,17 @@ Task Failure → Failure Monitoring + Logs → Preprocessing & Enrichment
   Quality Agent      Connectivity Agent
         │                  │                       │
         ▼                  ▼                       ▼
- ┌───────────────┐  ┌───────────────────┐  ┌───────────────┐
- │ get_table_    │  │ is_record_latest  │  │ get_table_    │
- │ schema        │  └───────────────────┘  │ schema        │
- └───────────────┘  ┌───────────────────┐  └───────────────┘
- ┌───────────────┐  │ trigger_dag_retry │  ┌───────────────┐
- │ query_table_  │  └───────────────────┘  │ query_table_  │
- │ count         │  ┌───────────────────┐  │ count         │
- └───────────────┘  │ record_retry_     │  └───────────────┘
- ┌───────────────┐  │ attempt           │  ┌───────────────┐
- │ execute_query │  └───────────────────┘  │ execute_query │
- └───────────────┘  ┌───────────────────┐  └───────────────┘
+ ┌───────────────┐  ┌───────────────────┐   ┌───────────────┐
+ │ get_table_    │  │ is_record_latest  │   │ get_table_    │
+ │ schema        │  └───────────────────┘   │ schema        │
+ └───────────────┘  ┌───────────────────┐   └───────────────┘
+ ┌───────────────┐  │ trigger_dag_retry │   ┌───────────────┐
+ │ query_table_  │  └───────────────────┘   │ query_table_  │
+ │ count         │  ┌───────────────────┐   │ count         │
+ └───────────────┘  │ record_retry_     │   └───────────────┘
+ ┌───────────────┐  │ attempt           │   ┌───────────────┐
+ │ execute_query │  └───────────────────┘   │ execute_query │
+ └───────────────┘   ┌───────────────────┐  └───────────────┘
                      │ update_infra_     │
                      │ job_status        │
                      └───────────────────┘
@@ -87,8 +87,6 @@ Task Failure → Failure Monitoring + Logs → Preprocessing & Enrichment
                  ▼                     ▼
          Safe Remediation      Human Escalation
 ```
-
-A failure comes in, agents investigate, tools gather evidence, and the system either acts safely or escalates to a human.
 
 ## Tech Stack
 
